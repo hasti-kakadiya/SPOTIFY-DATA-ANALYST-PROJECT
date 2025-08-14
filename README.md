@@ -69,22 +69,129 @@ In advanced stages, the focus shifts to improving query performance. Some optimi
 ## 15 Practice Questions
 
 ### Easy Level
-1. Retrieve the names of all tracks that have more than 1 billion streams.
-2. List all albums along with their respective artists.
-3. Get the total number of comments for tracks where `licensed = TRUE`.
-4. Find all tracks that belong to the album type `single`.
-5. Count the total number of tracks by each artist.
+**1. Retrieve the names of all tracks that have more than 1 billion streams.**
+```SQL
+SELECT * FROM spotify
+where stream > 1000000000;
+``
+
+***2. List all albums along with their respective artists.***
+```SQL
+
+select 
+	distinct album,artist
+from spotify
+order by 1;
+```
+**3. Get the total number of comments for tracks where `licensed = TRUE`.**
+```SQL
+select sum(comments) from  spotify
+where licensed='true';
+```
+**4. Find all tracks that belong to the album type `single`.**
+```SQL
+select * from spotify
+where album_type = 'single';
+```
+**5. Count the total number of tracks by each artist.**
+```SQL
+select 
+	artist,
+	count(*) as total_no_song
+from spotify
+group by artist 
+order by 2 
+
+```
 
 ### Medium Level
-1. Calculate the average danceability of tracks in each album.
-2. Find the top 5 tracks with the highest energy values.
-3. List all tracks along with their views and likes where `official_video = TRUE`.
-4. For each album, calculate the total views of all associated tracks.
-5. Retrieve the track names that have been streamed on Spotify more than YouTube.
+1. ***Calculate the average danceability of tracks in each album.***
+```SQL
+select 
+ 	album,
+	avg(danceability) as avg_danceability
+from spotify
+group by 1
+order by 1 
+``
+2. ***Find the top 5 tracks with the highest energy values.***
+```SQL
+select 
+	distinct track,
+	max(energy)
+from spotify
+group by 1
+order by 2 desc
+limit 5
+```
+   
+3. ***List all tracks along with their views and likes where `official_video = TRUE`.***
+   ```SQL
+select 
+	track,
+	sum(views) as total_views,
+	sum(likes) as total_likes
+from spotify
+where official_video= 'true'
+group by 1
+order by 2 desc
+   ```
+5. ***For each album, calculate the total views of all associated tracks.***
 
+   ```SQL
+select 
+	 album,
+	 track,
+	 sum(views)
+from spotify
+group by 1, 2
+   ```
+6. ***Retrieve the track names that have been streamed on Spotify more than YouTube.***
+```SQL
+select * from 
+(select 
+	track,
+	coalesce(sum(case when most_played_on ='youtube' then stream end),0) as streamed_on_youtube,
+	coalesce(sum(case when most_played_on ='spotify' then stream end),0)as streamed_on_spotify
+	--most_played_on
+from spotify
+group by 1
+)as t1
+where streamed_on_spotify > streamed_on_youtube
+and streamed_on_youtube <>0
+```
 ### Advanced Level
-1. Find the top 3 most-viewed tracks for each artist using window functions.
-2. Write a query to find tracks where the liveness score is above the average.
+1. ***Find the top 3 most-viewed tracks for each artist using window functions.***
+  ```SQL
+--each artits and total view for each track
+--track with heighest view for each artist( we need top)
+--dense rank
+--cte and filter rank <=3
+with ranking_artist
+as
+(select
+	artist,
+	track,
+	sum(views) as total_view,
+	dense_rank()over(partition by artist order by sum(views) desc) as rank
+from spotify
+group by 1,2
+order by 1,3 desc
+)
+select * from ranking_artist
+where rank <= 3
+
+ ```
+   
+2. **Write a query to find tracks where the liveness score is above the average.**
+   ```SQL
+   select 
+	track,
+	artist,
+	liveness
+from spotify
+where liveness > (select avg(liveness) from spotify )
+   ```
 3. **Use a `WITH` clause to calculate the difference between the highest and lowest energy values for tracks in each album.**
 ```sql
 WITH cte
@@ -152,14 +259,6 @@ This optimization shows how indexing can drastically reduce query time, improvin
 - **SQL Queries**: DDL, DML, Aggregations, Joins, Subqueries, Window Functions
 - **Tools**: pgAdmin 4 (or any SQL editor), PostgreSQL (via Homebrew, Docker, or direct installation)
 
-## How to Run the Project
-1. Install PostgreSQL and pgAdmin (if not already installed).
-2. Set up the database schema and tables using the provided normalization structure.
-3. Insert the sample data into the respective tables.
-4. Execute SQL queries to solve the listed problems.
-5. Explore query optimization techniques for large datasets.
-
----
 
 ## Next Steps
 - **Visualize the Data**: Use a data visualization tool like **Tableau** or **Power BI** to create dashboards based on the query results.
