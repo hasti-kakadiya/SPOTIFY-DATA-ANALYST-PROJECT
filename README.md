@@ -105,7 +105,7 @@ order by 2
 ```
 
 ### Medium Level
-1. ***Calculate the average danceability of tracks in each album.***
+**1. Calculate the average danceability of tracks in each album.**
 ```SQL
 select 
  	album,
@@ -113,8 +113,8 @@ select
 from spotify
 group by 1
 order by 1 
-``
-2. ***Find the top 5 tracks with the highest energy values.***
+```
+**2. Find the top 5 tracks with the highest energy values.**
 ```SQL
 select 
 	distinct track,
@@ -125,8 +125,8 @@ order by 2 desc
 limit 5
 ```
    
-3. ***List all tracks along with their views and likes where `official_video = TRUE`.***
-   ```SQL
+3. **List all tracks along with their views and likes where `official_video = TRUE.**
+```SQL
 select 
 	track,
 	sum(views) as total_views,
@@ -135,10 +135,9 @@ from spotify
 where official_video= 'true'
 group by 1
 order by 2 desc
-   ```
-5. ***For each album, calculate the total views of all associated tracks.***
-
-   ```SQL
+```
+**5. For each album, calculate the total views of all associated tracks.**
+```SQL
 select 
 	 album,
 	 track,
@@ -146,7 +145,7 @@ select
 from spotify
 group by 1, 2
    ```
-6. ***Retrieve the track names that have been streamed on Spotify more than YouTube.***
+**6. Retrieve the track names that have been streamed on Spotify more than YouTube.**
 ```SQL
 select * from 
 (select 
@@ -161,7 +160,7 @@ where streamed_on_spotify > streamed_on_youtube
 and streamed_on_youtube <>0
 ```
 ### Advanced Level
-1. ***Find the top 3 most-viewed tracks for each artist using window functions.***
+**1. Find the top 3 most-viewed tracks for each artist using window functions.***
   ```SQL
 --each artits and total view for each track
 --track with heighest view for each artist( we need top)
@@ -183,7 +182,7 @@ where rank <= 3
 
  ```
    
-2. **Write a query to find tracks where the liveness score is above the average.**
+**2. Write a query to find tracks where the liveness score is above the average.**
    ```SQL
    select 
 	track,
@@ -192,7 +191,7 @@ where rank <= 3
 from spotify
 where liveness > (select avg(liveness) from spotify )
    ```
-3. **Use a `WITH` clause to calculate the difference between the highest and lowest energy values for tracks in each album.**
+**3. Use a `WITH` clause to calculate the difference between the highest and lowest energy values for tracks in each album.**
 ```sql
 WITH cte
 AS
